@@ -34,7 +34,19 @@ const TS_Generator = () => {
       text.push(`${title} - ${value}`);
     });
 
-    return text.map((_) => <PreviewLine text={_} />);
+    return text.map((_, index) => <PreviewLine text={_} key={index} />);
+  };
+
+  const closeOnOutsideClick = (e, ref) => {
+    const dialogDimensions = ref.current.getBoundingClientRect();
+    if (
+      e.clientX < dialogDimensions.left ||
+      e.clientX > dialogDimensions.right ||
+      e.clientY < dialogDimensions.top ||
+      e.clientY > dialogDimensions.bottom
+    ) {
+      ref.current.close();
+    }
   };
 
   useEffect(() => {
@@ -134,7 +146,9 @@ const TS_Generator = () => {
           <dialog
             className="ts-gen__modal"
             ref={customModal}
-            onClick={() => customModal.current.close()}
+            onClick={(e) => {
+              closeOnOutsideClick(e, customModal);
+            }}
           >
             <form method="dialog">
               <Input

@@ -1,6 +1,6 @@
 .ts-gen {
   &__container {
-    container: ts-gen / inline-size;
+    // container: ts-gen / inline-size;
 
     width: 100%;
     max-width: var(--wrapper);
@@ -62,6 +62,10 @@
 
     &-wrapper {
       position: relative;
+      width: 100%;
+
+      display: flex;
+      gap: 10px;
     }
   }
 
@@ -137,7 +141,7 @@
   }
 }
 
-@container ts-gen (min-width: 1024px) {
+@media (min-width: 1024px) {
   .ts-gen {
     &__block {
       flex-basis: 45%;
