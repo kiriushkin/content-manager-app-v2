@@ -1,0 +1,51 @@
+.input {
+  position: relative;
+
+  transform: translateY(0px);
+  opacity: 1;
+  transition: 0.2s ease-in-out;
+
+  width: 100%;
+
+  font-size: 2.2rem;
+
+  &_hidden {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  &__el {
+    padding: 20px;
+    width: 100%;
+
+    border: none;
+    border-radius: 10px;
+
+    background-color: var(--black-2);
+
+    font-size: inherit;
+
+    &:focus {
+      outline: none;
+    }
+
+    &:focus ~ .input__title,
+    &:not([value='']) ~ .input__title {
+      top: 0;
+
+      font-size: 1.8rem;
+      color: var(--green);
+    }
+  }
+
+  &__title {
+    position: absolute;
+    top: 50%;
+    left: 1em;
+    transform: translateY(-50%);
+
+    color: var(--gray-2);
+
+    transition: 0.3s;
+  }
+}

@@ -1,0 +1,149 @@
+.Nav {
+  position: relative;
+  z-index: 99;
+  min-height: 100px;
+
+  container: nav / inline-size;
+  width: 100%;
+
+  &__container {
+    position: fixed;
+    z-index: 999;
+    top: 0;
+    left: 0;
+
+    transform: translateX(-100%);
+    transition: 0.3s transform;
+
+    width: 100%;
+    max-width: var(--wrapper);
+    height: 100vh;
+    height: 100dvh;
+
+    margin-inline: auto;
+    padding: 20px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 25px;
+
+    background-color: var(--black);
+  }
+
+  &__item {
+    padding: 10px 15px;
+    position: relative;
+    z-index: 5;
+    font-size: 2.2rem;
+
+    transform: translateX(-100%);
+    opacity: 0;
+
+    text-transform: uppercase;
+    font-weight: 700;
+
+    animation: fade-in-left 0.3s ease-in-out 1 forwards;
+
+    cursor: pointer;
+
+    @for $i from 1 through 10 {
+      &:nth-child(#{$i}) {
+        animation-delay: 0.2s * $i;
+      }
+    }
+
+    &::before,
+    &::after {
+      content: '';
+
+      position: absolute;
+
+      bottom: 0px;
+      left: 0px;
+
+      height: 5px;
+      width: 5px;
+    }
+
+    &::before {
+      z-index: -1;
+
+      background-color: var(--green);
+
+      transition: 0.2s;
+    }
+
+    &::after {
+      z-index: -3;
+
+      background-color: var(--gray);
+
+      transition: 0.2s height, 0.2s 0.2s width;
+    }
+
+    &:hover {
+      &::before {
+        height: 100%;
+      }
+
+      &::after {
+        height: 100%;
+        width: 100%;
+      }
+    }
+  }
+
+  &__burger {
+    position: absolute;
+    z-index: 9999;
+
+    top: 5px;
+    right: 5px;
+
+    height: 80px;
+    width: 80px;
+
+    svg {
+      pointer-events: none;
+      height: 80px;
+      position: absolute;
+      width: 80px;
+    }
+  }
+
+  &.active {
+    .Nav {
+      &__container {
+        transform: translateX(0);
+      }
+    }
+  }
+}
+
+@keyframes fade-in-left {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@container nav (min-width: 700px) {
+  .Nav {
+    &__container {
+      position: static;
+      transform: translateX(0);
+      flex-direction: row;
+
+      height: fit-content;
+    }
+
+    &__burger {
+      display: none;
+    }
+  }
+}

@@ -1,0 +1,44 @@
+:root {
+  --white: #fff;
+  --gray: #555;
+  --gray-2: #777;
+  --black: #0a0a0a;
+  --black-2: #141414;
+  --yellow: #f6e179;
+  --red: #b80c09;
+  --green: #86c133;
+  --blue: #12263a;
+
+  --wrapper: 1240px;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: 'Onest';
+  color: var(--white);
+
+  margin: 0;
+}
+
+html {
+  font-size: 10px;
+}
+
+body {
+  background-color: var(--black);
+}
+
+button {
+  font-size: 1.5rem;
+  padding: 1em 2em;
+  border: 0;
+  border-radius: 10px;
+
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.App {
+  min-height: 100vh;
+  min-height: 100dvh;
+}

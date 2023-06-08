@@ -1,25 +1,27 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from 'react';
+import Loader from './Loader.jsx';
+import Nav from './Components/Nav/Nav.jsx';
+import TS_Generator from './Components/TS-Generator/TS-Generator.jsx';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+  }, [isLoading, setIsLoading]);
+
+  return <div className="App">{isLoading ? <Loader /> : <Rest />}</div>;
 }
+
+const Rest = () => {
+  return (
+    <>
+      <Nav />
+      <TS_Generator />
+    </>
+  );
+};
 
 export default App;
