@@ -112,6 +112,29 @@
       }
     }
   }
+
+  &__modal {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    padding: 20px;
+
+    background-color: var(--black);
+    border: none;
+    border-radius: 10px;
+
+    &::backdrop {
+      background-color: #333333aa;
+    }
+
+    .ts-gen__btn {
+      margin-top: 20px;
+      margin-inline: auto;
+      display: block;
+      width: fit-content;
+    }
+  }
 }
 
 @container ts-gen (min-width: 1024px) {

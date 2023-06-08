@@ -12,7 +12,10 @@ const TS_Generator = () => {
   const [preview, setPreview] = useState([]);
   const [isReordering, setIsReordering] = useState(false);
 
+  const [customValue, setCustomValue] = useState('');
+
   const plusModal = useRef(null);
+  const customModal = useRef(null);
 
   const handleOnDragEnd = (result) => {
     if (!result.destination) return;
@@ -78,18 +81,10 @@ const TS_Generator = () => {
                   className="ts-gen__plus-dialog-item"
                   onClick={() => {
                     plusModal.current.close();
-                    setInputs([
-                      ...inputs,
-                      {
-                        id: uuid(),
-                        index: inputs.length,
-                        title: 'New one',
-                        value: '',
-                      },
-                    ]);
+                    customModal.current.showModal();
                   }}
                 >
-                  Input
+                  Custom
                 </div>
               </dialog>
             </div>
@@ -135,6 +130,39 @@ const TS_Generator = () => {
           <div className="ts-gen__block">
             <div className="ts-gen__preview">{preview}</div>
           </div>
+
+          <dialog
+            className="ts-gen__modal"
+            ref={customModal}
+            onClick={() => customModal.current.close()}
+          >
+            <form method="dialog">
+              <Input
+                title={'Title'}
+                value={customValue}
+                onChange={(e) => setCustomValue(e.target.value)}
+              />
+              <button
+                type="submit"
+                className="ts-gen__btn"
+                onClick={() => {
+                  setInputs([
+                    ...inputs,
+                    {
+                      id: uuid(),
+                      index: inputs.length,
+                      title: customValue,
+                      value: '',
+                    },
+                  ]);
+
+                  setCustomValue('');
+                }}
+              >
+                Добавить
+              </button>
+            </form>
+          </dialog>
         </div>
       </Context.Provider>
     </DragDropContext>
