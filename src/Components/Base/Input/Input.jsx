@@ -1,4 +1,5 @@
 import './Input.scss';
+import 'animate.css';
 import { useRef, useContext } from 'react';
 import Context from '../../TS-Generator/Context.js';
 
@@ -8,7 +9,14 @@ const Input = ({ title, onChange, value }) => {
   const { isReordering } = useContext(Context);
 
   return (
-    <div className="input" ref={ref}>
+    <div
+      className={`input ${
+        isReordering
+          ? 'animate__animated animate__headShake animate__infinite'
+          : ''
+      }`}
+      ref={ref}
+    >
       <input
         type="text"
         className="input__el"
