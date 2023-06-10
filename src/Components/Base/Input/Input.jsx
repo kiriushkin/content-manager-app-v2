@@ -1,28 +1,38 @@
 import './Input.scss';
 import 'animate.css';
-import { useRef, useContext } from 'react';
-import Context from '../../TS-Generator/Context.js';
+import { Draggable } from 'react-beautiful-dnd';
 
-const Input = ({ title, onChange, value }) => {
-  const ref = useRef(null);
-
-  const { isReordering } = useContext(Context);
-
+const Input = ({ isDraggable, id, index, title, onChange, value }) => {
+  if (isDraggable)
+    return (
+      <Draggable draggableId={id} index={index}>
+        {(provided) => (
+          <div
+            className={`input`}
+            {...provided.draggableProps}
+            ref={provided.innerRef}
+          >
+            <input
+              type="text"
+              className="input__el"
+              onChange={onChange}
+              value={value}
+            />
+            <span className="input__title">{title}</span>
+            <div className="input__drag-zone" {...provided.dragHandleProps}>
+              <i className="fa-solid fa-grip"></i>
+            </div>
+          </div>
+        )}
+      </Draggable>
+    );
   return (
-    <div
-      className={`input ${
-        isReordering
-          ? 'animate__animated animate__headShake animate__infinite'
-          : ''
-      }`}
-      ref={ref}
-    >
+    <div className={`input`}>
       <input
         type="text"
         className="input__el"
         onChange={onChange}
         value={value}
-        style={{ pointerEvents: isReordering ? 'none' : 'unset' }}
       />
       <span className="input__title">{title}</span>
     </div>

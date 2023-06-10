@@ -3,6 +3,7 @@
   --gray: #555;
   --gray-2: #777;
   --black: #0a0a0a;
+  --black-1: #121212;
   --black-2: #242424;
   --black-3: #333;
   --yellow: #f6e179;
@@ -11,6 +12,7 @@
   --blue: #12263a;
 
   --wrapper: 1240px;
+  --border-radius: 10px;
 }
 
 * {
@@ -29,11 +31,25 @@ body {
   background-color: var(--black);
 }
 
+input {
+  &[type='text'] {
+    padding: 20px;
+    width: 100%;
+
+    border: none;
+    border-radius: var(--border-radius);
+
+    background-color: var(--black-2);
+
+    font-size: inherit;
+  }
+}
+
 button {
   font-size: 1.5rem;
   padding: 1em 2em;
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--border-radius);
 
   cursor: pointer;
   transition: 0.3s;

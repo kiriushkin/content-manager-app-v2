@@ -1,18 +1,45 @@
 import './TS-Generator.scss';
 import { useState, useEffect, useRef } from 'react';
 import { v4 as uuid } from 'uuid';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import Context from './Context.js';
+import Block from './Block.jsx';
 import Input from '../Base/Input/Input.jsx';
+import { BLOCK_TYPES } from './BlockTypes.js';
 
 const TS_Generator = () => {
-  const data = ['title', 'yam', 'fbx', 'some'];
+  const data = [
+    {
+      type: BLOCK_TYPES.INPUT,
+      id: uuid(),
+      title: 'title',
+      value: '',
+    },
+    {
+      type: BLOCK_TYPES.INPUT,
+      id: uuid(),
+      title: 'yam',
+      value: '',
+    },
+    {
+      type: BLOCK_TYPES.INPUT,
+      id: uuid(),
+      title: 'fbx',
+      value: '',
+    },
+    {
+      type: BLOCK_TYPES.DROPDOWN,
+      id: uuid(),
+      title: 'AF',
+      value: '',
+      options: ['Lucky Online', 'Leadbit'],
+    },
+  ];
 
-  const [inputs, setInputs] = useState([]);
+  const [blocks, setBlocks] = useState(data);
   const [preview, setPreview] = useState([]);
-  const [isReordering, setIsReordering] = useState(false);
 
-  const [customValue, setCustomValue] = useState('');
+  const [customItem, setCustomItem] = useState({ type: '', value: '' });
 
   const plusModal = useRef(null);
   const customModal = useRef(null);
@@ -20,17 +47,17 @@ const TS_Generator = () => {
   const handleOnDragEnd = (result) => {
     if (!result.destination) return;
 
-    const newInputs = [...inputs];
+    const newInputs = [...blocks];
     const [resorderedInput] = newInputs.splice(result.source.index, 1);
     newInputs.splice(result.destination.index, 0, resorderedInput);
 
-    setInputs(newInputs);
+    setBlocks(newInputs);
   };
 
   const getPreview = () => {
     const text = [];
 
-    inputs.forEach(({ title, value }) => {
+    blocks.forEach(({ title, value }) => {
       text.push(`${title} - ${value}`);
     });
 
@@ -50,19 +77,12 @@ const TS_Generator = () => {
   };
 
   useEffect(() => {
-    const newInputs = data.map((title) => {
-      return { id: uuid(), title: title, value: '' };
-    });
-    setInputs([...newInputs]);
-  }, []);
-
-  useEffect(() => {
     setPreview(getPreview());
-  }, [inputs]);
+  }, [blocks]);
 
   return (
     <DragDropContext onDragEnd={handleOnDragEnd}>
-      <Context.Provider value={{ isReordering }}>
+      <Context.Provider value={{}}>
         <div className="ts-gen ts-gen__container">
           <div className="ts-gen__panel">
             <div className="ts-gen__btn-wrapper">
@@ -72,16 +92,7 @@ const TS_Generator = () => {
                   plusModal.current.show();
                 }}
               >
-                +
-              </button>
-
-              <button
-                className="ts-gen__btn"
-                onClick={() => {
-                  setIsReordering(!isReordering);
-                }}
-              >
-                🔁
+                <i className="fa-solid fa-plus"></i>
               </button>
 
               <dialog ref={plusModal} className="ts-gen__plus-dialog">
@@ -96,7 +107,32 @@ const TS_Generator = () => {
                     customModal.current.showModal();
                   }}
                 >
-                  Custom
+                  <div className="ts-gen__plus-dialog-title">Custom</div>
+
+                  <div className="ts-gen__plus-dialog-item ts-gen__plus-dialog-subitem">
+                    <div
+                      className="ts-gen__plus-dialog-title"
+                      onClick={() =>
+                        setCustomItem({
+                          ...customItem,
+                          type: BLOCK_TYPES.INPUT,
+                        })
+                      }
+                    >
+                      Input
+                    </div>
+                    <div
+                      className="ts-gen__plus-dialog-title"
+                      onClick={() =>
+                        setCustomItem({
+                          ...customItem,
+                          type: BLOCK_TYPES.DROPDOWN,
+                        })
+                      }
+                    >
+                      Dropdown
+                    </div>
+                  </div>
                 </div>
               </dialog>
             </div>
@@ -109,28 +145,26 @@ const TS_Generator = () => {
                 {...provided.droppableProps}
                 ref={provided.innerRef}
               >
-                {inputs.map(({ id, title, value }, index) => {
+                {blocks.map(({ id, type, title, value, options }, index) => {
                   return (
-                    <Draggable key={id} draggableId={id} index={index}>
-                      {(provided) => (
-                        <div
-                          className="ts-gen__row"
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          ref={provided.innerRef}
-                        >
-                          <Input
-                            title={title}
-                            value={value}
-                            onChange={(e) => {
-                              const newInputs = [...inputs];
-                              newInputs[index].value = e.target.value;
-                              setInputs(newInputs);
-                            }}
-                          />
-                        </div>
-                      )}
-                    </Draggable>
+                    <div className="ts-gen__row" key={id}>
+                      <Block
+                        type={type}
+                        isDraggable={true}
+                        id={id}
+                        index={index}
+                        title={title}
+                        options={options}
+                        value={value}
+                        onChange={(eOrValue) => {
+                          const newInputs = [...blocks];
+                          newInputs[index].value = eOrValue?.target
+                            ? eOrValue.target.value
+                            : eOrValue;
+                          setBlocks(newInputs);
+                        }}
+                      />
+                    </div>
                   );
                 })}
 
@@ -153,24 +187,28 @@ const TS_Generator = () => {
             <form method="dialog">
               <Input
                 title={'Title'}
-                value={customValue}
-                onChange={(e) => setCustomValue(e.target.value)}
+                value={customItem.value}
+                onChange={(e) =>
+                  setCustomItem({ ...customItem, value: e.target.value })
+                }
               />
               <button
                 type="submit"
                 className="ts-gen__btn"
-                onClick={() => {
-                  setInputs([
-                    ...inputs,
+                onClick={(e) => {
+                  if (!customItem.value) return e.preventDefault();
+                  setBlocks([
+                    ...blocks,
                     {
+                      type: customItem.type,
                       id: uuid(),
-                      index: inputs.length,
-                      title: customValue,
+                      index: blocks.length,
+                      title: customItem.value,
                       value: '',
                     },
                   ]);
 
-                  setCustomValue('');
+                  setCustomItem({ type: '', value: '' });
                 }}
               >
                 Добавить

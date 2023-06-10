@@ -33,7 +33,6 @@
   }
 
   &__btn {
-    width: 70px;
     height: 70px;
 
     text-align: center;
@@ -75,7 +74,7 @@
 
     background-color: var(--black-2);
 
-    border-radius: 10px;
+    border-radius: var(--border-radius);
 
     display: flex;
     flex-direction: column;
@@ -93,8 +92,7 @@
 
     background-color: var(--gray);
     border: none;
-    border-radius: 10px;
-    overflow: hidden;
+    border-radius: var(--border-radius);
 
     &-bg {
       position: fixed;
@@ -106,9 +104,23 @@
     }
 
     &-item {
+      position: relative;
+      border-radius: var(--border-radius);
+    }
+
+    &-subitem {
+      position: absolute;
+      top: 0;
+      left: 100%;
+
+      background-color: var(--gray);
+    }
+
+    &-title {
       padding: 1em 2em;
       font-size: 2rem;
 
+      border-radius: var(--border-radius);
       cursor: pointer;
 
       &:hover {
@@ -126,7 +138,7 @@
 
     background-color: var(--black);
     border: none;
-    border-radius: 10px;
+    border-radius: var(--border-radius);
 
     &::backdrop {
       background-color: #333333aa;
