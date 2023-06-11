@@ -5,59 +5,49 @@ import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import Context from './Context.js';
 import Block from './Block.jsx';
 import Input from '../Base/Input/Input.jsx';
-import { BLOCK_TYPES } from './BlockTypes.js';
+import { elements as testElements, schema } from './TestData.js';
 
 const TS_Generator = () => {
-  const data = [
-    {
-      type: BLOCK_TYPES.INPUT,
-      id: uuid(),
-      title: 'title',
-      value: '',
-    },
-    {
-      type: BLOCK_TYPES.INPUT,
-      id: uuid(),
-      title: 'yam',
-      value: '',
-    },
-    {
-      type: BLOCK_TYPES.INPUT,
-      id: uuid(),
-      title: 'fbx',
-      value: '',
-    },
-    {
-      type: BLOCK_TYPES.DROPDOWN,
-      id: uuid(),
-      title: 'AF',
-      value: '',
-      options: ['Lucky Online', 'Leadbit'],
-    },
-  ];
-
-  const [blocks, setBlocks] = useState(data);
+  const [blocks, setBlocks] = useState([]);
+  const [elements, setElements] = useState([]);
   const [preview, setPreview] = useState([]);
+
+  const [isDeleteVisible, setIsDeleteVisible] = useState(false);
 
   const [customItem, setCustomItem] = useState({ type: '', value: '' });
 
   const plusModal = useRef(null);
   const customModal = useRef(null);
 
+  const handleOnDragStart = () => {
+    setIsDeleteVisible(true);
+  };
+
   const handleOnDragEnd = (result) => {
     if (!result.destination) return;
 
-    const newInputs = [...blocks];
-    const [resorderedInput] = newInputs.splice(result.source.index, 1);
-    newInputs.splice(result.destination.index, 0, resorderedInput);
+    if (result.destination.droppableId === 'delete-zone') {
+      const newBlocks = [...blocks];
+      newBlocks.splice(result.source.index, 1);
+      setBlocks(newBlocks);
+    }
 
-    setBlocks(newInputs);
+    if (result.destination.droppableId === 'blocks') {
+      const newBlocks = [...blocks];
+      const [resorderedInput] = newBlocks.splice(result.source.index, 1);
+      newBlocks.splice(result.destination.index, 0, resorderedInput);
+
+      setBlocks(newBlocks);
+    }
+
+    setIsDeleteVisible(false);
   };
 
   const getPreview = () => {
     const text = [];
 
-    blocks.forEach(({ title, value }) => {
+    blocks.forEach(({ showInPreview, title, value, isVisible }) => {
+      if (!showInPreview || !isVisible) return;
       text.push(`${title} - ${value}`);
     });
 
@@ -77,11 +67,25 @@ const TS_Generator = () => {
   };
 
   useEffect(() => {
+    setBlocks(
+      schema.map((item) => ({
+        ...item,
+        value: '',
+        isVisible: item.isVisible ? item.isVisible : true,
+      }))
+    );
+    setElements(testElements);
+  }, []);
+
+  useEffect(() => {
     setPreview(getPreview());
   }, [blocks]);
 
   return (
-    <DragDropContext onDragEnd={handleOnDragEnd}>
+    <DragDropContext
+      onDragEnd={handleOnDragEnd}
+      onDragStart={handleOnDragStart}
+    >
       <Context.Provider value={{}}>
         <div className="ts-gen ts-gen__container">
           <div className="ts-gen__panel">
@@ -100,71 +104,60 @@ const TS_Generator = () => {
                   className="ts-gen__plus-dialog-bg"
                   onClick={() => plusModal.current.close()}
                 ></div>
-                <div
-                  className="ts-gen__plus-dialog-item"
-                  onClick={() => {
-                    plusModal.current.close();
-                    customModal.current.showModal();
-                  }}
-                >
-                  <div className="ts-gen__plus-dialog-title">Custom</div>
+                {elements.map((element) => {
+                  const { id, title } = element;
+                  if (blocks.find((block) => block.id === id)) return '';
 
-                  <div className="ts-gen__plus-dialog-item ts-gen__plus-dialog-subitem">
+                  return (
                     <div
-                      className="ts-gen__plus-dialog-title"
-                      onClick={() =>
-                        setCustomItem({
-                          ...customItem,
-                          type: BLOCK_TYPES.INPUT,
-                        })
-                      }
+                      key={id}
+                      className="ts-gen__plus-dialog-item"
+                      onClick={() => {
+                        plusModal.current.close();
+                        // customModal.current.showModal();
+                        setBlocks([
+                          ...blocks,
+                          { ...element, value: '', isVisible: true },
+                        ]);
+                      }}
                     >
-                      Input
+                      <div className="ts-gen__plus-dialog-title">{title}</div>
                     </div>
-                    <div
-                      className="ts-gen__plus-dialog-title"
-                      onClick={() =>
-                        setCustomItem({
-                          ...customItem,
-                          type: BLOCK_TYPES.DROPDOWN,
-                        })
-                      }
-                    >
-                      Dropdown
-                    </div>
-                  </div>
-                </div>
+                  );
+                })}
               </dialog>
             </div>
           </div>
 
-          <Droppable droppableId="inputs">
+          <Droppable droppableId="blocks">
             {(provided) => (
               <div
-                className="ts-gen__block"
+                className="ts-gen__section"
                 {...provided.droppableProps}
                 ref={provided.innerRef}
               >
-                {blocks.map(({ id, type, title, value, options }, index) => {
+                {blocks.map(({ id, ...props }, index) => {
                   return (
-                    <div className="ts-gen__row" key={id}>
-                      <Block
-                        type={type}
-                        isDraggable={true}
-                        id={id}
-                        index={index}
-                        title={title}
-                        options={options}
-                        value={value}
-                        onChange={(eOrValue) => {
-                          const newInputs = [...blocks];
-                          newInputs[index].value = eOrValue?.target
-                            ? eOrValue.target.value
-                            : eOrValue;
-                          setBlocks(newInputs);
-                        }}
-                      />
-                    </div>
+                    <Block
+                      id={id}
+                      key={id}
+                      isDraggable={true}
+                      index={index}
+                      {...props}
+                      onChange={(eOrValue) => {
+                        const newBlocks = [...blocks];
+                        newBlocks[index].value = eOrValue?.target
+                          ? eOrValue.target.value
+                          : eOrValue;
+                        setBlocks(newBlocks);
+                      }}
+                      changeVisibility={() => {
+                        const newBlocks = [...blocks];
+                        newBlocks[index].isVisible =
+                          !newBlocks[index].isVisible;
+                        setBlocks(newBlocks);
+                      }}
+                    />
                   );
                 })}
 
@@ -173,9 +166,22 @@ const TS_Generator = () => {
             )}
           </Droppable>
 
-          <div className="ts-gen__block">
+          <div className="ts-gen__section">
             <div className="ts-gen__preview">{preview}</div>
           </div>
+
+          <Droppable droppableId="delete-zone">
+            {(provided) => (
+              <div
+                className="ts-gen__panel ts-gen__delete-zone"
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                style={{ opacity: isDeleteVisible ? 1 : 0 }}
+              >
+                <i className="fa-solid fa-trash"></i>
+              </div>
+            )}
+          </Droppable>
 
           <dialog
             className="ts-gen__modal"

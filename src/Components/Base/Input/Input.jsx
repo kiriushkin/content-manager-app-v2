@@ -2,7 +2,18 @@ import './Input.scss';
 import 'animate.css';
 import { Draggable } from 'react-beautiful-dnd';
 
-const Input = ({ isDraggable, id, index, title, onChange, value }) => {
+const Input = ({
+  isDraggable,
+  showInPreview,
+  isVisible,
+  changeVisibility,
+  id,
+  index,
+  title,
+  onChange,
+  value,
+  additionalOption,
+}) => {
   if (isDraggable)
     return (
       <Draggable draggableId={id} index={index}>
@@ -19,8 +30,24 @@ const Input = ({ isDraggable, id, index, title, onChange, value }) => {
               value={value}
             />
             <span className="input__title">{title}</span>
-            <div className="input__drag-zone" {...provided.dragHandleProps}>
-              <i className="fa-solid fa-grip"></i>
+            <div className="input__options">
+              {additionalOption}
+              {showInPreview ? (
+                <div
+                  className="input__option-icon"
+                  onClick={() => changeVisibility()}
+                >
+                  <i
+                    className="fa-regular fa-eye"
+                    style={{ opacity: isVisible ? 1 : 0.5 }}
+                  ></i>
+                </div>
+              ) : (
+                ''
+              )}
+              <div className="input__option-icon" {...provided.dragHandleProps}>
+                <i className="fa-solid fa-grip"></i>
+              </div>
             </div>
           </div>
         )}

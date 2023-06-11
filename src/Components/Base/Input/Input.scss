@@ -35,14 +35,21 @@
     transform: translateY(-50%);
 
     color: var(--gray-2);
+    text-transform: capitalize;
 
     transition: 0.3s;
   }
 
-  &__drag-zone {
+  &__options {
     position: absolute;
     top: 0;
     right: 0;
+
+    height: 100%;
+    display: flex;
+  }
+
+  &__option-icon {
     height: 100%;
     width: 2.5em;
 
@@ -51,5 +58,7 @@
     align-items: center;
 
     font-size: 1.25em;
+
+    cursor: pointer;
   }
 }

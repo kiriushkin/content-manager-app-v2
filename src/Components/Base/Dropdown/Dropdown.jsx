@@ -2,7 +2,7 @@ import './Dropdown.scss';
 import { useState, useEffect, useRef } from 'react';
 import Input from '../Input/Input.jsx';
 
-const Dropdown = ({ options = [], ...props }) => {
+const Dropdown = ({ items = [], ...props }) => {
   const [isShown, setIsShown] = useState(false);
   const [currentOptions, setCurrentOptions] = useState([]);
   const [optionIndex, setOptionIndex] = useState(-1);
@@ -13,7 +13,7 @@ const Dropdown = ({ options = [], ...props }) => {
 
   useEffect(() => {
     setCurrentOptions(
-      options.filter((option) => option.match(new RegExp(value, 'i')))
+      items.filter((option) => option.match(new RegExp(value, 'i')))
     );
 
     setIsShown(value !== '');
@@ -46,10 +46,18 @@ const Dropdown = ({ options = [], ...props }) => {
             [optionIndex].click();
       }}
     >
-      <Input {...props} />
-      <button className="dropdown__btn" onClick={() => setIsShown(!isShown)}>
-        <i className="fa-solid fa-caret-down"></i>
-      </button>
+      <Input
+        {...props}
+        additionalOption={
+          <div
+            className="dropdown__btn input__option-icon"
+            onClick={() => setIsShown(!isShown)}
+          >
+            <i className="fa-solid fa-caret-down"></i>
+          </div>
+        }
+      />
+
       <dialog className="dropdown__options" ref={dialog} open={isShown}>
         {currentOptions.map((option, index) => (
           <div

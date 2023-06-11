@@ -8,6 +8,7 @@
     padding-inline: 20px;
 
     display: flex;
+    justify-content: space-between;
     flex-wrap: wrap;
     gap: 10px;
   }
@@ -15,21 +16,6 @@
   &__panel {
     flex: 100% 1;
     margin-bottom: 10px;
-  }
-
-  &__block {
-    flex-basis: 100%;
-
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  &__row {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    // gap: 20px;
   }
 
   &__btn {
@@ -68,21 +54,6 @@
     }
   }
 
-  &__preview {
-    padding: 1em;
-    min-height: max(200px, 100%);
-
-    background-color: var(--black-2);
-
-    border-radius: var(--border-radius);
-
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-
-    font-size: 2rem;
-  }
-
   &__plus-dialog {
     z-index: 99;
     top: 70px;
@@ -93,6 +64,7 @@
     background-color: var(--gray);
     border: none;
     border-radius: var(--border-radius);
+    overflow: hidden;
 
     &-bg {
       position: fixed;
@@ -105,28 +77,55 @@
 
     &-item {
       position: relative;
-      border-radius: var(--border-radius);
-    }
 
-    &-subitem {
-      position: absolute;
-      top: 0;
-      left: 100%;
-
-      background-color: var(--gray);
-    }
-
-    &-title {
       padding: 1em 2em;
       font-size: 2rem;
-
-      border-radius: var(--border-radius);
       cursor: pointer;
 
       &:hover {
         background-color: var(--gray-2);
       }
     }
+  }
+
+  &__delete-zone {
+    height: 70px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: var(--red);
+    border-radius: var(--border-radius);
+
+    font-size: 2.5rem;
+    transition: opacity 0.5s;
+  }
+
+  &__section {
+    flex-basis: 100%;
+
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    &:has(.ts-gen__preview) {
+      min-height: max(200px, 100%);
+    }
+  }
+
+  &__preview {
+    padding: 1em;
+
+    background-color: var(--black-2);
+    border-radius: var(--border-radius);
+
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    font-size: 2rem;
   }
 
   &__modal {
@@ -155,8 +154,8 @@
 
 @media (min-width: 1024px) {
   .ts-gen {
-    &__block {
-      flex-basis: 45%;
+    &__section {
+      flex-basis: calc(50% - 10px);
     }
   }
 }
