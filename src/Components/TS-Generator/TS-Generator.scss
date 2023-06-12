@@ -1,21 +1,21 @@
 .ts-gen {
   &__container {
-    // container: ts-gen / inline-size;
-
+    height: 100%;
     width: 100%;
-    max-width: var(--wrapper);
-    margin-inline: auto;
-    padding-inline: 20px;
 
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 20px;
+
+    &:has(.ts-gen__preview) {
+      height: fit-content;
+    }
   }
 
   &__panel {
     flex: 100% 1;
-    margin-bottom: 10px;
+    height: fit-content;
   }
 
   &__btn {
@@ -25,15 +25,22 @@
     background-color: var(--gray);
 
     &:hover {
-      background-color: var(--gray-2);
+      .ts-gen__btn-text {
+        margin-left: 10px;
+        width: 70px;
+      }
     }
 
-    &_settings {
-      background-color: var(--blue);
+    &_blue {
+      background-color: var(--blue-bg);
     }
 
-    &_reset {
-      background-color: var(--red);
+    &_red {
+      background-color: var(--red-bg);
+    }
+
+    &_green {
+      background-color: var(--green-bg);
     }
 
     &_hidden {
@@ -51,6 +58,19 @@
 
       display: flex;
       gap: 10px;
+    }
+
+    i {
+      font-size: 2.5rem;
+    }
+
+    &-text {
+      margin-left: 0;
+      width: 0px;
+
+      text-align: center;
+      overflow: hidden;
+      transition: 0.3s;
     }
   }
 
@@ -88,17 +108,17 @@
     }
   }
 
-  &__delete-zone {
-    height: 70px;
+  &__row {
+    position: relative;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    gap: calc(100vw - var(--wrapper));
+    width: 100%;
 
-    background-color: var(--red);
-    border-radius: var(--border-radius);
+    transition: left 0.3s;
 
-    font-size: 2.5rem;
-    transition: opacity 0.5s;
+    & > * {
+      flex: 1 0 100%;
+    }
   }
 
   &__section {
@@ -108,24 +128,62 @@
     flex-direction: column;
     gap: 20px;
 
+    &:first-child {
+      height: fit-content;
+    }
+
     &:has(.ts-gen__preview) {
-      min-height: max(200px, 100%);
+      min-height: 68px;
     }
   }
 
   &__preview {
+    flex-grow: 1;
     padding: 1em;
 
     background-color: var(--black-2);
     border-radius: var(--border-radius);
-
-    height: 100%;
 
     display: flex;
     flex-direction: column;
     gap: 10px;
 
     font-size: 2rem;
+  }
+
+  &__delete-zone {
+    height: 70px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: var(--red-bg);
+    border-radius: var(--border-radius);
+
+    font-size: 2.5rem;
+    transition: opacity 0.5s;
+  }
+
+  &__element {
+    &-item {
+      padding: 20px;
+
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 20px;
+
+      background-color: var(--black-2);
+      border-radius: var(--border-radius);
+    }
+
+    &-icon {
+      font-size: 2.5rem;
+    }
+
+    &-title {
+      font-size: 2rem;
+    }
   }
 
   &__modal {

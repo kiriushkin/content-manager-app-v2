@@ -22,6 +22,6 @@ const elements = [
   },
 ];
 
-const schema = [elements[0]];
+const scheme = [elements[0]];
 
-export { elements, schema };
+export { elements, scheme };

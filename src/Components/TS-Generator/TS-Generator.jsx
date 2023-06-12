@@ -1,23 +1,17 @@
 import './TS-Generator.scss';
-import { useState, useEffect, useRef } from 'react';
-import { v4 as uuid } from 'uuid';
+import { useState, useEffect, useRef, useContext } from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import Context from './Context.js';
 import Block from './Block.jsx';
-import Input from '../Base/Input/Input.jsx';
-import { elements as testElements, schema } from './TestData.js';
+import { BLOCK_TYPES } from './BlockTypes.js';
+import { elements as testElements, scheme } from './TestData.js';
 
 const TS_Generator = () => {
   const [blocks, setBlocks] = useState([]);
   const [elements, setElements] = useState([]);
-  const [preview, setPreview] = useState([]);
+  const [menuIndex, setMenuIndex] = useState(0);
 
   const [isDeleteVisible, setIsDeleteVisible] = useState(false);
-
-  const [customItem, setCustomItem] = useState({ type: '', value: '' });
-
-  const plusModal = useRef(null);
-  const customModal = useRef(null);
 
   const handleOnDragStart = () => {
     setIsDeleteVisible(true);
@@ -43,32 +37,9 @@ const TS_Generator = () => {
     setIsDeleteVisible(false);
   };
 
-  const getPreview = () => {
-    const text = [];
-
-    blocks.forEach(({ showInPreview, title, value, isVisible }) => {
-      if (!showInPreview || !isVisible) return;
-      text.push(`${title} - ${value}`);
-    });
-
-    return text.map((_, index) => <PreviewLine text={_} key={index} />);
-  };
-
-  const closeOnOutsideClick = (e, ref) => {
-    const dialogDimensions = ref.current.getBoundingClientRect();
-    if (
-      e.clientX < dialogDimensions.left ||
-      e.clientX > dialogDimensions.right ||
-      e.clientY < dialogDimensions.top ||
-      e.clientY > dialogDimensions.bottom
-    ) {
-      ref.current.close();
-    }
-  };
-
   useEffect(() => {
     setBlocks(
-      schema.map((item) => ({
+      scheme.map((item) => ({
         ...item,
         value: '',
         isVisible: item.isVisible ? item.isVisible : true,
@@ -77,158 +48,234 @@ const TS_Generator = () => {
     setElements(testElements);
   }, []);
 
-  useEffect(() => {
-    setPreview(getPreview());
-  }, [blocks]);
-
   return (
     <DragDropContext
       onDragEnd={handleOnDragEnd}
       onDragStart={handleOnDragStart}
     >
-      <Context.Provider value={{}}>
-        <div className="ts-gen ts-gen__container">
-          <div className="ts-gen__panel">
-            <div className="ts-gen__btn-wrapper">
-              <button
-                className="ts-gen__btn"
-                onClick={() => {
-                  plusModal.current.show();
-                }}
-              >
-                <i className="fa-solid fa-plus"></i>
-              </button>
-
-              <dialog ref={plusModal} className="ts-gen__plus-dialog">
-                <div
-                  className="ts-gen__plus-dialog-bg"
-                  onClick={() => plusModal.current.close()}
-                ></div>
-                {elements.map((element) => {
-                  const { id, title } = element;
-                  if (blocks.find((block) => block.id === id)) return '';
-
-                  return (
-                    <div
-                      key={id}
-                      className="ts-gen__plus-dialog-item"
-                      onClick={() => {
-                        plusModal.current.close();
-                        // customModal.current.showModal();
-                        setBlocks([
-                          ...blocks,
-                          { ...element, value: '', isVisible: true },
-                        ]);
-                      }}
-                    >
-                      <div className="ts-gen__plus-dialog-title">{title}</div>
-                    </div>
-                  );
-                })}
-              </dialog>
+      <Context.Provider
+        value={{
+          menuIndex,
+          setMenuIndex,
+          blocks,
+          setBlocks,
+          elements,
+          isDeleteVisible,
+        }}
+      >
+        <div className="wrapper">
+          <div className="ts-gen__container">
+            <MainControlPanel />
+            <div
+              className="ts-gen__row"
+              style={{
+                left: `calc(${menuIndex} * (-100% - (100vw - var(--wrapper))))`,
+              }}
+            >
+              <SchemeContainer />
+              <ElementsContainer />
             </div>
           </div>
-
-          <Droppable droppableId="blocks">
-            {(provided) => (
-              <div
-                className="ts-gen__section"
-                {...provided.droppableProps}
-                ref={provided.innerRef}
-              >
-                {blocks.map(({ id, ...props }, index) => {
-                  return (
-                    <Block
-                      id={id}
-                      key={id}
-                      isDraggable={true}
-                      index={index}
-                      {...props}
-                      onChange={(eOrValue) => {
-                        const newBlocks = [...blocks];
-                        newBlocks[index].value = eOrValue?.target
-                          ? eOrValue.target.value
-                          : eOrValue;
-                        setBlocks(newBlocks);
-                      }}
-                      changeVisibility={() => {
-                        const newBlocks = [...blocks];
-                        newBlocks[index].isVisible =
-                          !newBlocks[index].isVisible;
-                        setBlocks(newBlocks);
-                      }}
-                    />
-                  );
-                })}
-
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-
-          <div className="ts-gen__section">
-            <div className="ts-gen__preview">{preview}</div>
-          </div>
-
-          <Droppable droppableId="delete-zone">
-            {(provided) => (
-              <div
-                className="ts-gen__panel ts-gen__delete-zone"
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                style={{ opacity: isDeleteVisible ? 1 : 0 }}
-              >
-                <i className="fa-solid fa-trash"></i>
-              </div>
-            )}
-          </Droppable>
-
-          <dialog
-            className="ts-gen__modal"
-            ref={customModal}
-            onClick={(e) => {
-              closeOnOutsideClick(e, customModal);
-            }}
-          >
-            <form method="dialog">
-              <Input
-                title={'Title'}
-                value={customItem.value}
-                onChange={(e) =>
-                  setCustomItem({ ...customItem, value: e.target.value })
-                }
-              />
-              <button
-                type="submit"
-                className="ts-gen__btn"
-                onClick={(e) => {
-                  if (!customItem.value) return e.preventDefault();
-                  setBlocks([
-                    ...blocks,
-                    {
-                      type: customItem.type,
-                      id: uuid(),
-                      index: blocks.length,
-                      title: customItem.value,
-                      value: '',
-                    },
-                  ]);
-
-                  setCustomItem({ type: '', value: '' });
-                }}
-              >
-                Добавить
-              </button>
-            </form>
-          </dialog>
         </div>
       </Context.Provider>
     </DragDropContext>
   );
 };
 
-const PreviewLine = ({ text }) => {
-  return <div>{text}</div>;
+const MainControlPanel = () => {
+  const { setMenuIndex } = useContext(Context);
+
+  return (
+    <div className="ts-gen__panel">
+      <div className="ts-gen__btn-wrapper">
+        <button
+          className="ts-gen__btn ts-gen__btn_blue"
+          onClick={() => setMenuIndex(0)}
+        >
+          <i className="fa-solid fa-tablet"></i>
+          <span className="ts-gen__btn-text">Scheme</span>
+        </button>
+        <button
+          className="ts-gen__btn ts-gen__btn_green"
+          onClick={() => setMenuIndex(1)}
+        >
+          <i className="fa-solid fa-cubes"></i>
+          <span className="ts-gen__btn-text">Elements</span>
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const SchemeContainer = () => {
+  const { blocks, setBlocks, isDeleteVisible } = useContext(Context);
+
+  return (
+    <div className="ts-gen ts-gen__container">
+      <SchemeControlPanel />
+
+      <div className="ts-gen__container">
+        <Droppable droppableId="blocks">
+          {(provided) => (
+            <div
+              className="ts-gen__section"
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+            >
+              {blocks.map(({ id, ...props }, index) => {
+                return (
+                  <Block
+                    id={id}
+                    key={id}
+                    isDraggable={true}
+                    index={index}
+                    {...props}
+                    onChange={(eOrValue) => {
+                      const newBlocks = [...blocks];
+                      newBlocks[index].value = eOrValue?.target
+                        ? eOrValue.target.value
+                        : eOrValue;
+                      setBlocks(newBlocks);
+                    }}
+                    changeVisibility={() => {
+                      const newBlocks = [...blocks];
+                      newBlocks[index].isVisible = !newBlocks[index].isVisible;
+                      setBlocks(newBlocks);
+                    }}
+                  />
+                );
+              })}
+
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+
+        <div className="ts-gen__section">
+          <Preview />
+        </div>
+      </div>
+
+      <Droppable droppableId="delete-zone">
+        {(provided) => (
+          <div
+            className="ts-gen__panel ts-gen__delete-zone"
+            ref={provided.innerRef}
+            {...provided.droppableProps}
+            style={{ opacity: isDeleteVisible ? 1 : 0 }}
+          >
+            <i className="fa-solid fa-trash"></i>
+          </div>
+        )}
+      </Droppable>
+    </div>
+  );
+};
+
+const SchemeControlPanel = () => {
+  const { blocks, setBlocks, elements } = useContext(Context);
+
+  const plusModal = useRef(null);
+
+  return (
+    <div className="ts-gen__panel">
+      <div className="ts-gen__btn-wrapper">
+        <button
+          className="ts-gen__btn"
+          onClick={() => {
+            plusModal.current.show();
+          }}
+        >
+          <i className="fa-solid fa-plus"></i>
+        </button>
+
+        <dialog ref={plusModal} className="ts-gen__plus-dialog">
+          <div
+            className="ts-gen__plus-dialog-bg"
+            onClick={() => plusModal.current.close()}
+          ></div>
+          {elements.map((element) => {
+            const { id, title } = element;
+            if (blocks.find((block) => block.id === id)) return '';
+
+            return (
+              <div
+                key={id}
+                className="ts-gen__plus-dialog-item"
+                onClick={() => {
+                  plusModal.current.close();
+                  setBlocks([
+                    ...blocks,
+                    { ...element, value: '', isVisible: true },
+                  ]);
+                }}
+              >
+                <div className="ts-gen__plus-dialog-title">{title}</div>
+              </div>
+            );
+          })}
+        </dialog>
+      </div>
+    </div>
+  );
+};
+
+const Preview = () => {
+  const { blocks } = useContext(Context);
+  const [preview, setPreview] = useState([]);
+
+  const getPreview = () => {
+    const text = [];
+
+    blocks.forEach(({ showInPreview, title, value, isVisible }) => {
+      if (!showInPreview || !isVisible) return;
+      text.push(`${title} - ${value}`);
+    });
+
+    return text.map((_, index) => <div key={index}>{_}</div>);
+  };
+
+  useEffect(() => {
+    setPreview(getPreview());
+  }, [blocks]);
+
+  return <div className="ts-gen__preview">{preview}</div>;
+};
+
+const ElementsContainer = () => {
+  const { elements } = useContext(Context);
+
+  return (
+    <div className="ts-gen__container">
+      <div className="ts-gen__panel"></div>
+      <div className="ts-gen__section">
+        {elements.map((element) => {
+          return <ElementsContainerItem key={element.id} {...element} />;
+        })}
+      </div>
+    </div>
+  );
+};
+
+const ElementsContainerItem = ({ type, title }) => {
+  return (
+    <div className="ts-gen__element-item">
+      <div className="ts-gen__element-icon">
+        {type === BLOCK_TYPES.INPUT ? (
+          <i className="fa-regular fa-keyboard"></i>
+        ) : (
+          ''
+        )}
+        {type === BLOCK_TYPES.DROPDOWN ? (
+          <i className="fa-solid fa-list"></i>
+        ) : (
+          ''
+        )}
+      </div>
+
+      <div className="ts-gen__element-title">{title}</div>
+    </div>
+  );
 };
 
 export default TS_Generator;
