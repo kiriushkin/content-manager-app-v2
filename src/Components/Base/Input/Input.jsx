@@ -8,6 +8,7 @@ const Input = ({
   isVisible,
   changeVisibility,
   noValue,
+  type,
   id,
   index,
   title,
@@ -26,7 +27,7 @@ const Input = ({
           >
             <input
               type="text"
-              className="input__el"
+              className={`input__el input__el_${type}`}
               disabled={noValue}
               onChange={noValue ? () => {} : onChange}
               value={noValue ? '' : value}

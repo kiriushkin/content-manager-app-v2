@@ -98,12 +98,26 @@
     &-item {
       position: relative;
 
-      padding: 1em 2em;
+      padding: 1em;
       font-size: 2rem;
       cursor: pointer;
 
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      background-color: var(--gray);
+
       &:hover {
-        background-color: var(--gray-2);
+        filter: brightness(1.1);
+      }
+
+      &_spacer {
+        background-color: var(--green-bg);
+      }
+
+      &_header {
+        background-color: var(--blue-bg);
       }
     }
   }
@@ -111,7 +125,7 @@
   &__row {
     position: relative;
     display: flex;
-    gap: calc(100vw - var(--wrapper));
+    gap: 40px;
     width: 100%;
 
     transition: left 0.3s;
@@ -211,8 +225,12 @@
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1240px) {
   .ts-gen {
+    &__row {
+      gap: calc(100vw - var(--wrapper) + 40px);
+    }
+
     &__section {
       flex-basis: calc(50% - 10px);
     }

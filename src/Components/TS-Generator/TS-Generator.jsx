@@ -5,6 +5,7 @@ import { v4 as uuid } from 'uuid';
 import Context from './Context.js';
 import Block from './Block.jsx';
 import { BLOCK_TYPES } from './BlockTypes.js';
+import Icon from '../Base/Icon/Icon.jsx';
 import { elements as testElements, scheme } from './TestData.js';
 
 const TS_Generator = () => {
@@ -70,7 +71,7 @@ const TS_Generator = () => {
             <div
               className="ts-gen__row"
               style={{
-                left: `calc(${menuIndex} * (-100% - (100vw - var(--wrapper))))`,
+                left: `calc(${menuIndex} * (-100vw))`,
               }}
             >
               <SchemeContainer />
@@ -196,7 +197,7 @@ const SchemeControlPanel = () => {
             onClick={() => plusModal.current.close()}
           ></div>
           <div
-            className="ts-gen__plus-dialog-item"
+            className="ts-gen__plus-dialog-item ts-gen__plus-dialog-item_spacer"
             onClick={() => {
               plusModal.current.close();
               setBlocks([
@@ -211,11 +212,12 @@ const SchemeControlPanel = () => {
               ]);
             }}
           >
+            <Icon icon={BLOCK_TYPES.SPACER} />
             <div className="ts-gen__plus-dialog-title">Spacer</div>
           </div>
 
           <div
-            className="ts-gen__plus-dialog-item"
+            className="ts-gen__plus-dialog-item ts-gen__plus-dialog-item_header"
             onClick={() => {
               plusModal.current.close();
               setBlocks([
@@ -231,10 +233,11 @@ const SchemeControlPanel = () => {
               ]);
             }}
           >
+            <Icon icon={BLOCK_TYPES.HEADER} />
             <div className="ts-gen__plus-dialog-title">Header</div>
           </div>
           {elements.map((element) => {
-            const { id, title } = element;
+            const { id, title, type } = element;
             if (blocks.find((block) => block.id === id)) return '';
 
             return (
@@ -249,6 +252,7 @@ const SchemeControlPanel = () => {
                   ]);
                 }}
               >
+                <Icon icon={type} />
                 <div className="ts-gen__plus-dialog-title">{title}</div>
               </div>
             );
@@ -305,16 +309,7 @@ const ElementsContainerItem = ({ type, title }) => {
   return (
     <div className="ts-gen__element-item">
       <div className="ts-gen__element-icon">
-        {type === BLOCK_TYPES.INPUT ? (
-          <i className="fa-regular fa-keyboard"></i>
-        ) : (
-          ''
-        )}
-        {type === BLOCK_TYPES.DROPDOWN ? (
-          <i className="fa-solid fa-list"></i>
-        ) : (
-          ''
-        )}
+        <Icon icon={type} />
       </div>
 
       <div className="ts-gen__element-title">{title}</div>

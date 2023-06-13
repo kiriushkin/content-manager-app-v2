@@ -30,6 +30,14 @@
     &:disabled ~ .input__title {
       color: var(--white);
     }
+
+    &.input__el_spacer {
+      background-color: var(--green-bg);
+    }
+
+    &.input__el_header {
+      background-color: var(--blue-bg);
+    }
   }
 
   &__title {
