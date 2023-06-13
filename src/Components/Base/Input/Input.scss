@@ -26,6 +26,10 @@
       font-size: 1.8rem;
       color: var(--green);
     }
+
+    &:disabled ~ .input__title {
+      color: var(--white);
+    }
   }
 
   &__title {

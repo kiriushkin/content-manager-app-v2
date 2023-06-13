@@ -7,6 +7,7 @@ const Input = ({
   showInPreview,
   isVisible,
   changeVisibility,
+  noValue,
   id,
   index,
   title,
@@ -26,8 +27,9 @@ const Input = ({
             <input
               type="text"
               className="input__el"
-              onChange={onChange}
-              value={value}
+              disabled={noValue}
+              onChange={noValue ? () => {} : onChange}
+              value={noValue ? '' : value}
             />
             <span className="input__title">{title}</span>
             <div className="input__options">

@@ -1,6 +1,7 @@
 import './TS-Generator.scss';
 import { useState, useEffect, useRef, useContext } from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+import { v4 as uuid } from 'uuid';
 import Context from './Context.js';
 import Block from './Block.jsx';
 import { BLOCK_TYPES } from './BlockTypes.js';
@@ -194,6 +195,44 @@ const SchemeControlPanel = () => {
             className="ts-gen__plus-dialog-bg"
             onClick={() => plusModal.current.close()}
           ></div>
+          <div
+            className="ts-gen__plus-dialog-item"
+            onClick={() => {
+              plusModal.current.close();
+              setBlocks([
+                ...blocks,
+                {
+                  type: BLOCK_TYPES.SPACER,
+                  title: 'Spacer',
+                  id: uuid(),
+                  showInPreview: true,
+                  isVisible: true,
+                },
+              ]);
+            }}
+          >
+            <div className="ts-gen__plus-dialog-title">Spacer</div>
+          </div>
+
+          <div
+            className="ts-gen__plus-dialog-item"
+            onClick={() => {
+              plusModal.current.close();
+              setBlocks([
+                ...blocks,
+                {
+                  type: BLOCK_TYPES.HEADER,
+                  title: 'Header',
+                  id: uuid(),
+                  showInPreview: true,
+                  isVisible: true,
+                  value: '',
+                },
+              ]);
+            }}
+          >
+            <div className="ts-gen__plus-dialog-title">Header</div>
+          </div>
           {elements.map((element) => {
             const { id, title } = element;
             if (blocks.find((block) => block.id === id)) return '';
@@ -222,17 +261,22 @@ const SchemeControlPanel = () => {
 
 const Preview = () => {
   const { blocks } = useContext(Context);
-  const [preview, setPreview] = useState([]);
+  const [preview, setPreview] = useState('');
 
   const getPreview = () => {
     const text = [];
 
-    blocks.forEach(({ showInPreview, title, value, isVisible }) => {
+    blocks.forEach(({ type, showInPreview, title, value, isVisible }) => {
       if (!showInPreview || !isVisible) return;
+      if (type === BLOCK_TYPES.SPACER) return text.push('');
+      if (type === BLOCK_TYPES.HEADER)
+        return (
+          text.push(''), text.push(`*${value.toUpperCase()}*`), text.push('')
+        );
       text.push(`${title} - ${value}`);
     });
 
-    return text.map((_, index) => <div key={index}>{_}</div>);
+    return text.join('\n');
   };
 
   useEffect(() => {
